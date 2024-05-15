@@ -3,6 +3,7 @@ using System;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
+using System.Diagnostics;
 
 namespace WeatherApp
 {
@@ -90,7 +91,8 @@ namespace WeatherApp
                 }
                 catch (Exception ex)
                 {
-                    WeatherLabel.Text = $"An error occurred: {ex.Message}";
+                    Debug.WriteLine($"Exception: {ex.Message}");
+                    await Application.Current.MainPage.DisplayAlert("Error", ex.Message, "Ok");
                 }
             }
         }
@@ -103,6 +105,12 @@ namespace WeatherApp
             try
             {
                 _isCheckingLocation = true;
+
+                var status = await Permissions.CheckStatusAsync<Permissions.LocationWhenInUse>();
+                if (status != PermissionStatus.Granted)
+                {
+                    status = await Permissions.RequestAsync<Permissions.LocationWhenInUse>();
+                }
 
                 GeolocationRequest request = new GeolocationRequest(GeolocationAccuracy.Medium, TimeSpan.FromSeconds(10));
 
@@ -133,7 +141,8 @@ namespace WeatherApp
             }
             catch (Exception ex)
             {
-                WeatherLabel.Text += $"Exception: {ex}";
+                Debug.WriteLine($"Exception: {ex.Message}");
+                await Application.Current.MainPage.DisplayAlert("Error", ex.Message, "Ok");
             }
             finally
             {
