@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
+using WeatherApp.ViewModel;
 
 namespace WeatherApp;
 
@@ -17,8 +18,11 @@ public static class MauiProgram
 
 #if DEBUG
 		builder.Logging.AddDebug();
+
+        builder.Services.AddSingleton<MainViewModel>();
+        builder.Services.AddSingleton<MainPage>();
 #endif
 
-		return builder.Build();
+        return builder.Build();
 	}
 }

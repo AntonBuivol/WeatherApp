@@ -4,6 +4,8 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
 using System.Diagnostics;
+using WeatherApp.ViewModel;
+
 
 namespace WeatherApp
 {
@@ -100,17 +102,12 @@ namespace WeatherApp
         private CancellationTokenSource _cancelTokenSource;
         private bool _isCheckingLocation;
 
+
         public async Task GetCurrentLocation()
         {
             try
             {
                 _isCheckingLocation = true;
-
-                var status = await Permissions.CheckStatusAsync<Permissions.LocationWhenInUse>();
-                if (status != PermissionStatus.Granted)
-                {
-                    status = await Permissions.RequestAsync<Permissions.LocationWhenInUse>();
-                }
 
                 GeolocationRequest request = new GeolocationRequest(GeolocationAccuracy.Medium, TimeSpan.FromSeconds(10));
 
@@ -125,7 +122,7 @@ namespace WeatherApp
                     double Longitude = location.Longitude;
 
                     GetWeatherFromLocation(Latitude, Longitude);
-                }            
+                }
             }
             catch (FeatureNotSupportedException fnsEx)
             {
@@ -137,7 +134,7 @@ namespace WeatherApp
             }
             catch (PermissionException pEx)
             {
-                WeatherLabel.Text += $"PermissionException: {pEx}";
+                await Application.Current.MainPage.DisplayAlert("Error", "You need to give permission to receive the location. Go to the application settings and give permission", "Ok"); ;
             }
             catch (Exception ex)
             {
