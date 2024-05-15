@@ -1,0 +1,12 @@
+﻿<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:d="http://schemas.microsoft.com/dotnet/2021/maui/design"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d"
+             x:Class="WeatherApp.MainPage">
+    <StackLayout Padding="20">
+        <Entry x:Name="LocationEntry" Placeholder="Enter location"/>
+        <Button Text="Get Weather" Clicked="OnGetWeatherClicked"/>
+        <Label x:Name="WeatherLabel" Text=""/>
+    </StackLayout>
+</ContentPage>
