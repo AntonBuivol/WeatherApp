@@ -1,9 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json.Linq;
 using System.Diagnostics;
-using System.Net.Http;
-using System.Threading.Tasks;
-using Microsoft.Maui.Controls;
-using Newtonsoft.Json.Linq;
 
 namespace WeatherApp
 {
@@ -13,23 +9,15 @@ namespace WeatherApp
         {
             InitializeComponent();
             GetCurrentLocation();
-
-            //    bool isConditionMet = true; // Example condition
-
-            //    if (isConditionMet)
-            //    {
-            //        // Set the source to the animated image
-            //        BackgroundImage.Source = "rain_gif.gif";
-            //        BackgroundImage.IsAnimationPlaying = true;
-            //    }
-            //    else
-            //    {
-            //        // Set the source to the static image
-            //        BackgroundImage.Source = "static_background.png";
-            //        BackgroundImage.IsAnimationPlaying = false;
-            //    }
         }
-        private void OnMenuClicked(object sender, EventArgs e)
+
+        protected override async void OnAppearing()
+        {
+            base.OnAppearing();
+            await gifView.StartAnimation();
+        }
+
+        private async void OnMenuClicked(object sender, EventArgs e)
         {
             // Toggle visibility of the overlay menu
             MenuOverlay.IsVisible = !MenuOverlay.IsVisible;
@@ -69,7 +57,6 @@ namespace WeatherApp
 
                         WeatherCard.BackgroundColor = GetBackgroundColor(condition);
                         UpdateWeatherLabels(curlocation, temperature, condition);
-                        UpdateWeatherIcon(condition);
                     }
                     else
                     {
@@ -97,7 +84,6 @@ namespace WeatherApp
                 return Colors.Transparent;
         }
 
-
         private void UpdateWeatherLabels(string curlocation, string temperature, string condition)
         {
             LocationLabel.Text = curlocation;
@@ -105,28 +91,30 @@ namespace WeatherApp
             ConditionLabel.Text = condition;
         }
 
-        private void UpdateWeatherIcon(string condition)
+        private async void GetCurrentLocation()
         {
-            if (condition.ToLower().Contains("rain"))
-                WeatherIcon.Source = "rain_icon.png"; // Ensure you have this image
-            else if (condition.ToLower().Contains("snow"))
-                WeatherIcon.Source = "snow_icon.png"; // Ensure you have this image
-            else if (condition.ToLower().Contains("sunny"))
-                WeatherIcon.Source = "sunny_icon.png"; // Ensure you have this image
-            else if (condition.ToLower().Contains("cloud"))
-                WeatherIcon.Source = "cloud_icon.png"; // Ensure you have this image
-            else
-                WeatherIcon.Source = "default_icon.png"; // Fallback image
+            try
+            {
+                GeolocationRequest request = new GeolocationRequest(GeolocationAccuracy.Medium, TimeSpan.FromSeconds(10));
+                Location location = await Geolocation.GetLocationAsync(request);
+
+                if (location != null)
+                {
+                    double Latitude = location.Latitude;
+                    double Longitude = location.Longitude;
+
+                    GetWeatherFromLocation(Latitude, Longitude);
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Exception: {ex.Message}");
+                ErrorLabel.Text = $"An error occurred: {ex.Message}";
+            }
         }
-
-
-
-        // anton
 
         private async void GetWeatherFromLocation(double Latitude, double Longitude)
         {
-            string location = OverlayLocationEntry.Text; // Get location from entry field
-
             string url = $"https://api.weatherapi.com/v1/current.json?key=aa7758b35f384a5eb62102337241405&q={Latitude},{Longitude}&aqi=no";
 
             using (HttpClient client = new HttpClient())
@@ -146,73 +134,16 @@ namespace WeatherApp
 
                         WeatherCard.BackgroundColor = GetBackgroundColor(condition);
                         UpdateWeatherLabels(curlocation, temperature, condition);
-                        UpdateWeatherIcon(condition);
                     }
                     else
                     {
-                        ErrorLabel.Text = $"Failed to retrieve weather data for {location}. Status code: {response.StatusCode}";
+                        ErrorLabel.Text = $"Failed to retrieve weather data. Status code: {response.StatusCode}";
                     }
                 }
                 catch (Exception ex)
                 {
-                    Debug.WriteLine($"Exception: {ex.Message}");
-                    await Application.Current.MainPage.DisplayAlert("Error", ex.Message, "Ok");
+                    ErrorLabel.Text = $"An error occurred: {ex.Message}";
                 }
-            }
-        }
-
-        private CancellationTokenSource _cancelTokenSource;
-        private bool _isCheckingLocation;
-
-
-        public async Task GetCurrentLocation()
-        {
-            try
-            {
-                _isCheckingLocation = true;
-
-                GeolocationRequest request = new GeolocationRequest(GeolocationAccuracy.Medium, TimeSpan.FromSeconds(10));
-
-                _cancelTokenSource = new CancellationTokenSource();
-
-                Location location = await Geolocation.Default.GetLocationAsync(request, _cancelTokenSource.Token);
-
-                if (location != null)
-                {
-                    double Latitude = location.Latitude;
-                    double Longitude = location.Longitude;
-
-                    GetWeatherFromLocation(Latitude, Longitude);
-                }
-            }
-            catch (FeatureNotSupportedException fnsEx)
-            {
-                ErrorLabel.Text += $"FeatureNotSupportedException: {fnsEx}";
-            }
-            catch (FeatureNotEnabledException fneEx)
-            {
-                ErrorLabel.Text += $"FeatureNotEnabledException: {fneEx}";
-            }
-            catch (PermissionException pEx)
-            {
-                await Application.Current.MainPage.DisplayAlert("Error", "You need to give permission to receive the location. Go to the application settings and give permission", "Ok"); ;
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine($"Exception: {ex.Message}");
-                await Application.Current.MainPage.DisplayAlert("Error", ex.Message, "Ok");
-            }
-            finally
-            {
-                _isCheckingLocation = false;
-            }
-        }
-
-        public void CancelRequest()
-        {
-            if (_isCheckingLocation && _cancelTokenSource != null && _cancelTokenSource.IsCancellationRequested == false)
-            {
-                _cancelTokenSource.Cancel();
             }
         }
     }
