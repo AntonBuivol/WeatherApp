@@ -1,12 +1,45 @@
 ﻿<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             xmlns:d="http://schemas.microsoft.com/dotnet/2021/maui/design"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             mc:Ignorable="d"
-             x:Class="WeatherApp.MainPage">
-    <StackLayout Padding="20">
-        <Entry x:Name="LocationEntry" Placeholder="Enter location"/>
-        <Button Text="Get Weather" Clicked="OnGetWeatherClicked"/>
-        <Label x:Name="WeatherLabel" Text=""/>
-    </StackLayout>
+             x:Class="WeatherApp.MainPage"
+             >
+    
+    <Grid>
+        <!-- Main content -->
+        <Image Source="rain_gif.gif" Aspect="AspectFill" IsAnimationPlaying="True" />
+
+        <StackLayout Padding="1" VerticalOptions="Center">
+
+            <!-- Weather card to display temperature and condition -->
+            <Frame x:Name="WeatherCard" CornerRadius="15" HasShadow="True" Padding="30" Margin="0" WidthRequest="350">
+                <StackLayout>
+                    <Label x:Name="LocationLabel" Text="" FontSize="Large"  Padding="10" HorizontalOptions="Center"/>
+                    <Image x:Name="WeatherIcon" Source="weather_placeholder.png" WidthRequest="50"  HeightRequest="50" HorizontalOptions="Center" Margin="0,0,0,10"/>
+
+                    <!-- Temperature Label -->
+                    <Label x:Name="TemperatureLabel" Text="" FontSize="Large"  Padding="10" HorizontalOptions="Center"/>
+
+                    <!-- Condition Label -->
+                    <Label x:Name="ConditionLabel" Text="" FontSize="Medium" HorizontalOptions="Center"/>
+                </StackLayout>
+            </Frame>
+        </StackLayout>
+        <Label x:Name="ErrorLabel" Text="" FontSize="Large" HorizontalOptions="Center"/>
+
+        <!-- Menu button in the top right corner -->
+        <Button Text="☰" Clicked="OnMenuClicked" HorizontalOptions="End" VerticalOptions="Start" BackgroundColor="#C0C0C0" FontSize="Large" />
+
+        <!-- Overlay with entry box for location -->
+        <AbsoluteLayout x:Name="MenuOverlay" IsVisible="False" BackgroundColor="Black" Opacity="0.7">
+            <StackLayout AbsoluteLayout.LayoutBounds="0, 0, 1, 1" AbsoluteLayout.LayoutFlags="All" Padding="40">
+                <Frame BackgroundColor="White" CornerRadius="10">
+                    <StackLayout>
+
+                        <Entry x:Name="OverlayLocationEntry" Placeholder="Enter location" HorizontalOptions="FillAndExpand"/>
+                        <Button Text="Get Weather" Clicked="OnOverlayGetWeatherClicked" HorizontalOptions="FillAndExpand" Margin="0,10,0,0"/>
+                    </StackLayout>
+                </Frame>
+            </StackLayout>
+        </AbsoluteLayout>
+    </Grid>
+
 </ContentPage>
