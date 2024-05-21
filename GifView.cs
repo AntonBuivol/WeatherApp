@@ -25,7 +25,7 @@ namespace WeatherApp
         private void LoadGif()
         {
             var assembly = Assembly.GetExecutingAssembly();
-            var resourceName = "WeatherApp.Assets.gomer.gif";
+            var resourceName = "WeatherApp.Assets.govno.jpeg";
 
             using (Stream stream = assembly.GetManifestResourceStream(resourceName))
             {

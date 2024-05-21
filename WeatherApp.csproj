@@ -48,6 +48,10 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <None Remove="Assets\bear.gif" />
+	  <None Remove="Assets\giphy.gif" />
+	  <None Remove="Assets\govno.jpeg" />
+	  <None Remove="Assets\image.gif" />
 	  <None Remove="Resources\Images\cloud_icon.png" />
 	  <None Remove="Resources\Images\rain_icon.png" />
 	  <None Remove="Resources\Images\snow_icon.png" />
@@ -65,7 +69,11 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <MauiAsset Include="Assets\Rain.gif" />
+	  <EmbeddedResource Include="Assets\bear.gif" />
+	  <EmbeddedResource Include="Assets\giphy.gif" />
+	  <EmbeddedResource Include="Assets\govno.jpeg" />
+	  <EmbeddedResource Include="Assets\image.gif" />
+	  <EmbeddedResource Include="Assets\Rain.gif" />
 	</ItemGroup>
 
 </Project>
