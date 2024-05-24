@@ -12,6 +12,8 @@ namespace WeatherApp
     {
         [PrimaryKey, AutoIncrement, Column("id")]
         public int Id { get; set; }
+
+        [Unique, Column("cityName")]
         public string CityName { get; set; }
     }
 }

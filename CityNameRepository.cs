@@ -26,9 +26,10 @@ namespace WeatherApp
             return database.Get<City>(id);
         }
 
-        public City SelectCity(int id)
+        public City SelectCityByName(string cityName)
         {
-            return database.Get<City>(id);
+            return database.Find<City>(city => city.CityName == cityName);
+
         }
 
         public int DeleteItem(int id)

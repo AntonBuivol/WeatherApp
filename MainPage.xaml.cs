@@ -80,7 +80,7 @@ namespace WeatherApp
                     }
                     else
                     {
-                        ErrorLabel.Text = $"Failed to retrieve weather data for {location}. Status code: {response.StatusCode}";
+                        await DisplayAlert("Error", "City not found. Check the spelling of the city", "OK");
                     }
                 }
                 catch (Exception ex)

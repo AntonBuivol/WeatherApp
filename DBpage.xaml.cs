@@ -1,4 +1,4 @@
-namespace WeatherApp;
+﻿namespace WeatherApp;
 
 public partial class DBpage : ContentPage
 {
@@ -29,6 +29,24 @@ public partial class DBpage : ContentPage
     private async void SelectCity(object sender, EventArgs e)
     {
 		var city = (City)BindingContext;
-		MainPage mainPage = new MainPage();
+        string location = city.CityName;
+
+        City selectedCity = App.Database.SelectCityByName(location);
+
+        if (selectedCity != null)
+        {
+            // Создаем экземпляр MainPage
+            MainPage mainPage = new MainPage();
+
+            // Вызываем асинхронный метод для получения данных о погоде
+            await Navigation.PushAsync(mainPage);
+            await mainPage.RetrieveWeatherData(selectedCity.CityName);
+
+        }
+        else
+        {
+            // Обработка ситуации, когда город не найден
+            await DisplayAlert("Error", "City not found", "OK");
+        }
     }
 }
