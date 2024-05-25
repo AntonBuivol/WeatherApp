@@ -30,12 +30,41 @@ namespace WeatherApp
             //    }
         }
 
+        public string anotherlocation;
+        public bool SelectFavoriteCity = false;
+
+        protected override void OnAppearing()
+        {
+
+            base.OnAppearing();
+            WeatherUpdate();
+        }
+
+        
+        private void WeatherUpdate()
+        {
+            if (SelectFavoriteCity)
+            {
+                RetrieveWeatherData(anotherlocation);
+                SelectFavoriteCity = false;
+                var navigationStack = Navigation.NavigationStack;
+
+                // Удаление Page1 и Page2 из стека
+                for (int i = navigationStack.Count - 2; i >= 0; i--) // - 2 это предпоследняя страница; если ставить - 1 будет последняя
+                {
+                    //Внутри цикла мы получаем ссылку на страницу по текущему индексу i и вызываем метод RemovePage у объекта Navigation, чтобы удалить эту страницу из стека навигации.
+                    var page = navigationStack[i];
+                    Navigation.RemovePage(page);
+                }
+            }
+        }
+
         private async void OnFavoriteClicked(object sender, EventArgs e)
         {
             DBListPage listPage = new DBListPage();
             await Navigation.PushAsync(listPage);
         }
-
+        
         private void OnMenuClicked(object sender, EventArgs e)
         {
             // Toggle visibility of the overlay menu
@@ -73,7 +102,6 @@ namespace WeatherApp
                         string curlocation = data["location"]["name"].ToString();
                         string temperature = data["current"]["temp_c"].ToString();
                         string condition = data["current"]["condition"]["text"].ToString();
-
                         WeatherCard.BackgroundColor = GetBackgroundColor(condition);
                         UpdateWeatherLabels(curlocation, temperature, condition);
                         UpdateWeatherIcon(condition);
@@ -129,7 +157,7 @@ namespace WeatherApp
 
 
         // anton
-
+        
         private async void GetWeatherFromLocation(double Latitude, double Longitude)
         {
             string location = OverlayLocationEntry.Text; // Get location from entry field

@@ -1,20 +1,26 @@
-﻿namespace WeatherApp;
+﻿using Newtonsoft.Json.Linq;
+using WeatherApp.ViewModel;
+
+namespace WeatherApp;
 
 public partial class DBpage : ContentPage
 {
+    MainPage mainPage = new MainPage();
 	public DBpage()
 	{
 		InitializeComponent();
 	}
-	private void SaveCity(object sender, EventArgs e)
+    private async void SaveCity(object sender, EventArgs e)
 	{
 		var city = (City)BindingContext;
 		if(!String.IsNullOrEmpty(city.CityName))
 		{
-			App.Database.SaveItem(city);
-		}
-		this.Navigation.PopAsync();
+            await RetrieveWeatherData(city.CityName, city);
+        }
+		await Navigation.PopAsync();
 	}
+
+
 	private void DeleteCity(object sender, EventArgs e)
 	{
         var city = (City)BindingContext;
@@ -26,27 +32,53 @@ public partial class DBpage : ContentPage
 		this.Navigation.PopAsync();
 	}
 
+
+    
     private async void SelectCity(object sender, EventArgs e)
     {
 		var city = (City)BindingContext;
-        string location = city.CityName;
+        mainPage.anotherlocation = city.CityName;
 
-        City selectedCity = App.Database.SelectCityByName(location);
+        City selectedCity = App.Database.SelectCityByName(mainPage.anotherlocation);
 
         if (selectedCity != null)
         {
-            // Создаем экземпляр MainPage
-            MainPage mainPage = new MainPage();
-
-            // Вызываем асинхронный метод для получения данных о погоде
+            
+            mainPage.SelectFavoriteCity = true;
             await Navigation.PushAsync(mainPage);
-            await mainPage.RetrieveWeatherData(selectedCity.CityName);
 
         }
         else
         {
             // Обработка ситуации, когда город не найден
             await DisplayAlert("Error", "City not found", "OK");
+        }
+    }
+    // добавляется температура при добавлении города
+    public async Task RetrieveWeatherData(string location, City city)
+    {
+        string url = $"https://api.weatherapi.com/v1/current.json?key=aa7758b35f384a5eb62102337241405&q={location}&aqi=no";
+
+        using (HttpClient client = new HttpClient())
+        {
+            HttpResponseMessage response = await client.GetAsync(url);
+
+            if (response.IsSuccessStatusCode)
+            {
+                string jsonResponse = await response.Content.ReadAsStringAsync();
+                JObject data = JObject.Parse(jsonResponse);
+                string temperature = data["current"]["temp_c"].ToString();
+
+                // После получения температуры присваиваем ее объекту city
+                city.temperature = temperature;
+
+                // Сохраняем объект city в базе данных
+                App.Database.SaveItem(city);
+            }
+            else
+            {
+                await DisplayAlert("Error", "City not found. Check the spelling of the city", "OK");
+            }
         }
     }
 }

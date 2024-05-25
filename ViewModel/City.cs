@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace WeatherApp
+namespace WeatherApp.ViewModel
 {
     [Table("Cities")]
     public class City
@@ -15,5 +15,7 @@ namespace WeatherApp
 
         [Unique, Column("cityName")]
         public string CityName { get; set; }
+
+        public string temperature { get; set; }
     }
 }

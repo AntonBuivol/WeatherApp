@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace WeatherApp
+namespace WeatherApp.ViewModel
 {
     public class CityNameRepository
     {
@@ -39,14 +39,22 @@ namespace WeatherApp
 
         public int SaveItem(City item)
         {
-            if(item.Id != 0)
+
+            try
             {
-                database.Update(item);
-                return item.Id;
+                if (item.Id != 0)
+                {
+                    database.Update(item);
+                    return item.Id;
+                }
+                else
+                {
+                    return database.Insert(item);
+                }
             }
-            else
+            catch (Exception ex)
             {
-                return database.Insert(item);
+                return 0;
             }
         }
     }
